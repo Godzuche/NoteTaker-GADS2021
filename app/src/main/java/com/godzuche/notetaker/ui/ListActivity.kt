@@ -18,6 +18,8 @@ import com.google.firebase.firestore.*
 import com.google.firebase.firestore.EventListener
 import com.godzuche.notetaker.data.Note
 import com.godzuche.notetaker.data.NoteViewModel
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import java.util.*
 
 class ListActivity : AppCompatActivity() {
@@ -95,7 +97,7 @@ class ListActivity : AppCompatActivity() {
         binding.contentList.listNotes.layoutManager = LinearLayoutManager(this)
         binding.contentList.listNotes.adapter = adapter
 
-        firestoreDB = FirebaseFirestore.getInstance()
+        firestoreDB = Firebase.firestore // FirebaseFirestore.getInstance()
         announcementsCollection = firestoreDB.collection("announcements")
 
         announcementsCollection
