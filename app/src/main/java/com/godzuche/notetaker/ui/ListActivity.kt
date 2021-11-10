@@ -203,9 +203,4 @@ class ListActivity : AppCompatActivity() {
 
     //endregion
 
-    companion object {
-        private const val NEW_NOTE_ACTIVITY_REQUEST_CODE = 1
-
-
-    }
 }
