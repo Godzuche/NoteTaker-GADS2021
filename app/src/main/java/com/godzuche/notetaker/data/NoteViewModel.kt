@@ -1,10 +1,9 @@
-package com.psdemo.notetaker.data
+package com.godzuche.notetaker.data
 
 import android.app.Application
 import android.os.AsyncTask
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import com.godzuche.notetaker.data.Note
 
 class NoteViewModel(application: Application) : AndroidViewModel(application) {
     val allNotes: LiveData<List<Note>>
@@ -12,7 +11,7 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         val noteDb = NoteRoomDatabase.getDatabase(application)
-        noteDao = noteDb!!.noteDao()
+        noteDao = noteDb.noteDao()
         allNotes = noteDao.allNotes
     }
 

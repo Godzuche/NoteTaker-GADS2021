@@ -1,4 +1,4 @@
-package com.psdemo.notetaker.data
+package com.godzuche.notetaker.data
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao

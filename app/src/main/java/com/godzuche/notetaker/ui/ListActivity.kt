@@ -3,11 +3,11 @@ package com.godzuche.notetaker.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.provider.ContactsContract
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -17,7 +17,7 @@ import com.godzuche.notetaker.databinding.ActivityListBinding
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.EventListener
 import com.godzuche.notetaker.data.Note
-import com.psdemo.notetaker.data.NoteViewModel
+import com.godzuche.notetaker.data.NoteViewModel
 import java.util.*
 
 class ListActivity : AppCompatActivity() {
@@ -43,10 +43,11 @@ class ListActivity : AppCompatActivity() {
 
         binding.fab.setOnClickListener {
             val activityIntent = Intent(this, NewNoteActivity::class.java)
-            startActivityForResult(activityIntent, NEW_NOTE_ACTIVITY_REQUEST_CODE)
+            getContent.launch(activityIntent)
         }
 
         loadData()
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -62,40 +63,6 @@ class ListActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_sync -> true
             else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == NEW_NOTE_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            val id = UUID.randomUUID().toString()
-            val title = data!!.getStringExtra(NewNoteActivity.NEW_TITLE)
-            val body = data.getStringExtra(NewNoteActivity.NEW_BODY)
-
-            val note = Note(id,
-                title!!,
-                body!!,
-                Calendar.getInstance().timeInMillis,
-                false)
-
-            if (userId == "-1") {
-                noteViewModel.insert(note)
-            } else {
-                addNoteToFirestore(note, firestoreDB.collection(userId))
-            }
-
-            Toast.makeText(
-                applicationContext,
-                R.string.saved,
-                Toast.LENGTH_LONG
-            ).show()
-        } else {
-            Toast.makeText(
-                applicationContext,
-                R.string.not_saved,
-                Toast.LENGTH_LONG
-            ).show()
         }
     }
 
@@ -198,6 +165,39 @@ class ListActivity : AppCompatActivity() {
                         }
                     }
                 })
+        }
+    }
+
+    private val getContent = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val intent = result.data
+            val id = UUID.randomUUID().toString()
+            val title = intent?.getStringExtra(NewNoteActivity.NEW_TITLE)
+            val body = intent?.getStringExtra(NewNoteActivity.NEW_BODY)
+
+            val note = Note(id,
+                title!!,
+                body!!,
+                Calendar.getInstance().timeInMillis,
+                false)
+
+            if (userId == "-1") {
+                noteViewModel.insert(note)
+            } else {
+                addNoteToFirestore(note, firestoreDB.collection(userId))
+            }
+
+            Toast.makeText(
+                applicationContext,
+                R.string.saved,
+                Toast.LENGTH_LONG
+            ).show()
+        } else {
+            Toast.makeText(
+                applicationContext,
+                R.string.not_saved,
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
