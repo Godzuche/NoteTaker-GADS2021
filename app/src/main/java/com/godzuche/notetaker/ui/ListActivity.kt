@@ -44,8 +44,8 @@ class ListActivity : AppCompatActivity() {
         userId = intent.getStringExtra(MainActivity.USER_ID)!!
 
         binding.fab.setOnClickListener {
-            val signInIntent = Intent(this, NewNoteActivity::class.java)
-            signInLauncher.launch(signInIntent)
+            val noteResultIntent = Intent(this, NewNoteActivity::class.java)
+            noteResultLauncher.launch(noteResultIntent)
         }
 
         loadData()
@@ -170,7 +170,7 @@ class ListActivity : AppCompatActivity() {
         }
     }
 
-    private val signInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    private val noteResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val intent = result.data
             val id = UUID.randomUUID().toString()
