@@ -9,9 +9,15 @@ import com.firebase.ui.auth.BuildConfig
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.godzuche.notetaker.databinding.ActivityMainBinding
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+
+/*Type in the commands on the terminal in the java sdk directory to get the hash keys...Use the release key hash
+//development key hash
+keytool -exportcert -alias androiddebugkey -keystore "C:\Users\Administrator\.android\debug.keystore" | "C:\Program Files\OpenSSL-Win64\bin\openssl" sha1 -binary | "C:\Program Files\OpenSSL-Win64\bin\openssl" base64
+
+// generating release key hash
+keytool -exportcert -alias androiddebugkey -keystore ~/.android/debug.keystore | "C:\Program Files\OpenSSL-Win64\bin\openssl.exe" sha1 -binary | "C:\Program Files\OpenSSL-Win64\bin\openssl.exe" base64*/
 
 class MainActivity : AppCompatActivity() {
     private val TAG = MainActivity::class.qualifiedName
@@ -26,7 +32,8 @@ class MainActivity : AppCompatActivity() {
         binding.btnSignIn.setOnClickListener {
             val providers = arrayListOf(
                 AuthUI.IdpConfig.EmailBuilder().build(),
-                AuthUI.IdpConfig.GoogleBuilder().build()
+                AuthUI.IdpConfig.GoogleBuilder().build(),
+                AuthUI.IdpConfig.FacebookBuilder().build()
             )
 
             val signInIntent = Intent(AuthUI.getInstance().createSignInIntentBuilder()
