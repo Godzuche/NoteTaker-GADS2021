@@ -33,7 +33,8 @@ class MainActivity : AppCompatActivity() {
             val providers = arrayListOf(
                 AuthUI.IdpConfig.EmailBuilder().build(),
                 AuthUI.IdpConfig.GoogleBuilder().build(),
-                AuthUI.IdpConfig.FacebookBuilder().build()
+                AuthUI.IdpConfig.FacebookBuilder().build(),
+                AuthUI.IdpConfig.PhoneBuilder().setDefaultCountryIso("NG").build()
             )
 
             val signInIntent = Intent(AuthUI.getInstance().createSignInIntentBuilder()
@@ -63,7 +64,7 @@ class MainActivity : AppCompatActivity() {
     private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
         val response = result.idpResponse
 
-        if (result.resultCode == RESULT_OK ) {
+        if (result.resultCode == RESULT_OK) {
             //Successfully signed in
             val user = Firebase.auth.currentUser
             val intent = Intent(this, ListActivity::class.java).apply {
@@ -74,7 +75,7 @@ class MainActivity : AppCompatActivity() {
             // Sign in failed. If response is null the user canceled the
             // sign-in flow using the back button. Otherwise check
             // response.getError().getErrorCode() and handle the error.
-            if (response?.error?.errorCode  == null ) {
+            if (response?.error?.errorCode == null) {
                 Log.e(TAG, "Back button pressed")
             } else {
                 Log.e(TAG, "Sign-in failed due to: ${response.error!!.errorCode}", response.error)
