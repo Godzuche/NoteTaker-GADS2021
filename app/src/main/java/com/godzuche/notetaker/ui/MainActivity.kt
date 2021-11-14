@@ -1,10 +1,12 @@
 package com.godzuche.notetaker.ui
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.BuildConfig
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
@@ -56,16 +58,21 @@ class MainActivity : AppCompatActivity() {
 
         val auth = Firebase.auth //FirebaseAuth.getInstance()
 
-        binding.btnSkip.setOnClickListener {
-            auth.signInAnonymously()
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful)
-                        loadListActivity()
-                    else {
-                        Log.e(TAG, "Anonymous sign-in failed", task.exception)
-                        Toast.makeText(this, "Sign-in failed", Toast.LENGTH_LONG).show()
+        if (intent.hasExtra(SIGNIN_MESSAGE)){
+            binding.btnSkip.isVisible = false
+            binding.tvMessage.text = intent.getStringExtra(SIGNIN_MESSAGE)
+        } else {
+            binding.btnSkip.setOnClickListener {
+                auth.signInAnonymously()
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful)
+                            loadListActivity()
+                        else {
+                            Log.e(TAG, "Anonymous sign-in failed", task.exception)
+                            Toast.makeText(this, "Sign-in failed", Toast.LENGTH_LONG).show()
+                        }
                     }
-                }
+            }
         }
 
         if (auth.currentUser != null && !auth.currentUser!!.isAnonymous) {
@@ -75,6 +82,11 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+    }
+
+    override fun onBackPressed() {
+        setResult(Activity.RESULT_CANCELED)
+        finish()
     }
 
     private val signInLauncher =
@@ -111,5 +123,6 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val USER_ID = "user_id"
+        const val SIGNIN_MESSAGE = "signin_message"
     }
 }
