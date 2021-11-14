@@ -3,6 +3,7 @@ package com.godzuche.notetaker.ui
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.BuildConfig
@@ -47,6 +48,7 @@ class MainActivity : AppCompatActivity() {
             val signInIntent = Intent(AuthUI.getInstance().createSignInIntentBuilder()
                 .setAvailableProviders(providers)
                 .setIsSmartLockEnabled(!BuildConfig.DEBUG, true)
+                .enableAnonymousUsersAutoUpgrade()
                 .build())
 
             signInLauncher.launch(signInIntent)
@@ -54,7 +56,19 @@ class MainActivity : AppCompatActivity() {
 
         val auth = Firebase.auth //FirebaseAuth.getInstance()
 
-        if (auth.currentUser != null) {
+        binding.btnSkip.setOnClickListener {
+            auth.signInAnonymously()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful)
+                        loadListActivity()
+                    else {
+                        Log.e(TAG, "Anonymous sign-in failed", task.exception)
+                        Toast.makeText(this, "Sign-in failed", Toast.LENGTH_LONG).show()
+                    }
+                }
+        }
+
+        if (auth.currentUser != null && !auth.currentUser!!.isAnonymous) {
             val intent = Intent(this, ListActivity::class.java)
             intent.putExtra(USER_ID, auth.currentUser!!.uid)
             startActivity(intent)
@@ -73,11 +87,7 @@ class MainActivity : AppCompatActivity() {
 
         if (result.resultCode == RESULT_OK) {
             //Successfully signed in
-            val user = Firebase.auth.currentUser
-            val intent = Intent(this, ListActivity::class.java).apply {
-                putExtra(USER_ID, user!!.uid)
-            }
-            startActivity(intent)
+            loadListActivity()
         } else {
             // Sign in failed. If response is null the user canceled the
             // sign-in flow using the back button. Otherwise check
@@ -89,6 +99,14 @@ class MainActivity : AppCompatActivity() {
             }
             // ...
         }
+    }
+
+    private fun loadListActivity() {
+        val user = Firebase.auth.currentUser
+        val intent = Intent(this, ListActivity::class.java).apply {
+            putExtra(USER_ID, user!!.uid)
+        }
+        startActivity(intent)
     }
 
     companion object {
