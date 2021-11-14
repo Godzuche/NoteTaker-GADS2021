@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -51,7 +52,8 @@ private lateinit var binding: ActivityNewNoteBinding
     private fun onSignInResult(result: ActivityResult) {
         if (result.resultCode == Activity.RESULT_CANCELED) {
             finish()
-        }
+        } else
+            Toast.makeText(this, "You can now create and save notes!", Toast.LENGTH_LONG).show()
     }
 
     companion object {

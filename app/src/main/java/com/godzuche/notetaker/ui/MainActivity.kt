@@ -25,6 +25,7 @@ keytool -exportcert -alias androiddebugkey -keystore ~/.android/debug.keystore |
 class MainActivity : AppCompatActivity() {
     private val TAG = MainActivity::class.qualifiedName
     private lateinit var binding: ActivityMainBinding
+    private var referred = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,9 +59,10 @@ class MainActivity : AppCompatActivity() {
 
         val auth = Firebase.auth //FirebaseAuth.getInstance()
 
-        if (intent.hasExtra(SIGNIN_MESSAGE)){
+        if (intent.hasExtra(SIGNIN_MESSAGE)) {
             binding.btnSkip.isVisible = false
             binding.tvMessage.text = intent.getStringExtra(SIGNIN_MESSAGE)
+            referred = true
         } else {
             binding.btnSkip.setOnClickListener {
                 auth.signInAnonymously()
@@ -99,7 +101,11 @@ class MainActivity : AppCompatActivity() {
 
         if (result.resultCode == RESULT_OK) {
             //Successfully signed in
-            loadListActivity()
+            if (referred) {
+                setResult(RESULT_OK)
+                finish()
+            } else
+                loadListActivity()
         } else {
             // Sign in failed. If response is null the user canceled the
             // sign-in flow using the back button. Otherwise check
