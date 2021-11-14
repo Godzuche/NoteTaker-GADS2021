@@ -29,12 +29,19 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
+        val countries = ArrayList<String>()
+        countries.add("+234")
+        //the ISO 2-character code can be used also : "NG"
+
         binding.btnSignIn.setOnClickListener {
             val providers = arrayListOf(
                 AuthUI.IdpConfig.EmailBuilder().build(),
                 AuthUI.IdpConfig.GoogleBuilder().build(),
                 AuthUI.IdpConfig.FacebookBuilder().build(),
-                AuthUI.IdpConfig.PhoneBuilder().setDefaultCountryIso("NG").build()
+                AuthUI.IdpConfig.PhoneBuilder()
+//                    .setDefaultCountryIso("NG")
+                    .setWhitelistedCountries(countries)
+                    .build()
             )
 
             val signInIntent = Intent(AuthUI.getInstance().createSignInIntentBuilder()
