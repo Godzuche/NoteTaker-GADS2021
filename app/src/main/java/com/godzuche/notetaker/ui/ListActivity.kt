@@ -81,7 +81,9 @@ class ListActivity : AppCompatActivity() {
                     startActivity(Intent(this, MainActivity::class.java))
                 Toast.makeText(this, "Successfully Signed out!", Toast.LENGTH_SHORT).show()
             }
-        invalidateOptionsMenu()
+            .addOnSuccessListener {
+                invalidateOptionsMenu()
+            }
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
@@ -117,6 +119,7 @@ class ListActivity : AppCompatActivity() {
     }
 
     private fun loadData() {
+        invalidateOptionsMenu()
         noteViewModel = ViewModelProvider(this)[NoteViewModel::class.java]
         adapter = ListRecyclerAdapter(this)
         binding.contentList.listNotes.layoutManager = LinearLayoutManager(this)
