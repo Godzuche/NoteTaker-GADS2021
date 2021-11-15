@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.BuildConfig
+import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.godzuche.notetaker.databinding.ActivityMainBinding
@@ -71,7 +72,7 @@ class MainActivity : AppCompatActivity() {
                             loadListActivity()
                         else {
                             Log.e(TAG, "Anonymous sign-in failed", task.exception)
-                            Toast.makeText(this, "Sign-in failed", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this, "Anonymous Sign-in failed", Toast.LENGTH_LONG).show()
                         }
                     }
             }
@@ -110,12 +111,48 @@ class MainActivity : AppCompatActivity() {
             // Sign in failed. If response is null the user canceled the
             // sign-in flow using the back button. Otherwise check
             // response.getError().getErrorCode() and handle the error.
-            if (response?.error?.errorCode == null) {
+            if (response != null && response.error != null && response.error!!.errorCode == ErrorCodes.ANONYMOUS_UPGRADE_MERGE_CONFLICT) {
+                Toast.makeText(this, "Anonymous Upgrade", Toast.LENGTH_SHORT).show()
+                // 1st save a copy of the data associated with the anonymous acct but in the case of our app, no data is associated yet
+
+                    //retrieve the existing account for linking
+                val fullCredential = response.credentialForLinking
+                //since there's no anom data let's skip data merging and just sign in
+                if (fullCredential != null) {
+                    val auth = Firebase.auth
+                    val prevUser = auth.currentUser
+                    auth.signInWithCredential(fullCredential)
+                        .addOnSuccessListener { result ->
+                            val currentUser = result.user
+                            Log.d(TAG, "SignInWithCredential: Success")
+                            Toast.makeText(this, "signInWithCredential: Success!", Toast.LENGTH_SHORT).show()
+                            // Merge prev and currentUser accounts and data
+                            if (referred) {
+                                val intentData = Intent()
+                                intentData.putExtra(USER_ID, currentUser!!.uid)
+                                setResult(RESULT_OK, intentData)
+                                finish()
+                            } else {
+                                loadListActivity()
+                            }
+                        }
+                        .addOnFailureListener {
+                            //
+                        }
+                }
+
+            }
+            /*else if (response!!.error?.errorCode == null) {
                 Log.e(TAG, "Back button pressed")
             } else {
                 Log.e(TAG, "Sign-in failed due to: ${response.error!!.errorCode}", response.error)
-            }
+                Toast.makeText(this, "Sign-in failed", Toast.LENGTH_LONG).show()
+            }*/
             // ...
+        }
+        if (result.resultCode != RESULT_OK && result.resultCode != RESULT_CANCELED) {
+            Log.e(TAG, "Sign-in failed", response?.error)
+            Toast.makeText(this, "Sign-in failed!", Toast.LENGTH_LONG).show()
         }
     }
 

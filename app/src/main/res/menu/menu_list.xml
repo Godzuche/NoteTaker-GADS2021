@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.psdemo.notetaker.ListActivity">
+    tools:context="com.godzuche.notetaker.ui.ListActivity">
     <item
         android:id="@+id/action_sync"
         android:icon="@drawable/ic_sync"
@@ -9,4 +9,11 @@
         android:title="@string/action_sync"
         android:visible="false"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_logout"
+        android:icon="@drawable/ic_baseline_login_24"
+        android:title="@string/logout"
+        android:visible="false"
+        app:showAsAction="ifRoom|withText"/>
 </menu>

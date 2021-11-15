@@ -12,12 +12,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.firebase.ui.auth.AuthUI
 import com.godzuche.notetaker.R
 import com.godzuche.notetaker.databinding.ActivityListBinding
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.EventListener
 import com.godzuche.notetaker.data.Note
 import com.godzuche.notetaker.data.NoteViewModel
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.*
@@ -64,8 +66,31 @@ class ListActivity : AppCompatActivity() {
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_sync -> true
+            R.id.action_logout -> {
+                logout()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun logout() {
+        AuthUI.getInstance().signOut(this)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful)
+                    startActivity(Intent(this, MainActivity::class.java))
+                Toast.makeText(this, "Successfully Signed out!", Toast.LENGTH_SHORT).show()
+            }
+        invalidateOptionsMenu()
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val auth = Firebase.auth
+        if (auth.currentUser != null && !auth.currentUser!!.isAnonymous) {
+            val menuItem = menu?.findItem(R.id.action_logout)
+            menuItem?.isVisible = true
+        }
+        return super.onPrepareOptionsMenu(menu)
     }
 
     //region data code
@@ -170,38 +195,52 @@ class ListActivity : AppCompatActivity() {
         }
     }
 
-    private val noteResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val intent = result.data
-            val id = UUID.randomUUID().toString()
-            val title = intent?.getStringExtra(NewNoteActivity.NEW_TITLE)
-            val body = intent?.getStringExtra(NewNoteActivity.NEW_BODY)
+    private val noteResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val intent = result.data
+                val id = UUID.randomUUID().toString()
+                val title = intent?.getStringExtra(NewNoteActivity.NEW_TITLE)
+                val body = intent?.getStringExtra(NewNoteActivity.NEW_BODY)
 
-            val note = Note(id,
-                title!!,
-                body!!,
-                Calendar.getInstance().timeInMillis,
-                false)
+                val note = Note(id,
+                    title!!,
+                    body!!,
+                    Calendar.getInstance().timeInMillis,
+                    false)
 
-            if (userId == "-1") {
-                noteViewModel.insert(note)
+                if (intent.hasExtra(MainActivity.USER_ID) && intent.getStringExtra(
+                        MainActivity.USER_ID) != userId && intent.getStringExtra(MainActivity.USER_ID) != "-1"
+                ) {
+                    userId = result.data!!.getStringExtra(MainActivity.USER_ID)!!
+                    loadData()
+                }
+
+                if (userId == "-1") {
+                    noteViewModel.insert(note)
+                } else {
+                    addNoteToFirestore(note, firestoreDB.collection(userId))
+                }
+
+                Toast.makeText(
+                    applicationContext,
+                    R.string.saved,
+                    Toast.LENGTH_LONG
+                ).show()
             } else {
-                addNoteToFirestore(note, firestoreDB.collection(userId))
+                Toast.makeText(
+                    applicationContext,
+                    R.string.not_saved,
+                    Toast.LENGTH_LONG
+                ).show()
+                if (result.data!!.hasExtra(MainActivity.USER_ID) && result.data!!.getStringExtra(
+                        MainActivity.USER_ID) != userId && result.data!!.getStringExtra(MainActivity.USER_ID) != "-1"
+                ) {
+                    userId = result.data!!.getStringExtra(MainActivity.USER_ID)!!
+                    loadData()
+                }
             }
-
-            Toast.makeText(
-                applicationContext,
-                R.string.saved,
-                Toast.LENGTH_LONG
-            ).show()
-        } else {
-            Toast.makeText(
-                applicationContext,
-                R.string.not_saved,
-                Toast.LENGTH_LONG
-            ).show()
         }
-    }
 
     //endregion
 

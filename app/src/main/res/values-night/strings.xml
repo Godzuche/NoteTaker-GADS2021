@@ -2,4 +2,5 @@
 <resources>
     <string name="skip">Skip</string>
     <string name="sign_in_default_message">Sign-in to get started</string>
+    <string name="logout">Logout</string>
 </resources>
