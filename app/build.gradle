@@ -83,6 +83,8 @@ dependencies {
 //    implementation 'com.facebook.android:facebook-android-sdk:latest.release'
     // Use this for login auth only instead of the full facebook sdk
     implementation 'com.facebook.android:facebook-login:12.1.0'
+    //twitter
+    implementation 'com.twitter.sdk.android:twitter-core:3.1.1'
 
 }
 
