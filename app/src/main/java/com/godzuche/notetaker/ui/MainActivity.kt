@@ -7,10 +7,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.BuildConfig
-import com.firebase.ui.auth.ErrorCodes
-import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
+import com.firebase.ui.auth.*
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.godzuche.notetaker.databinding.ActivityMainBinding
 import com.google.firebase.auth.ktx.auth
@@ -111,7 +108,9 @@ class MainActivity : AppCompatActivity() {
             // Sign in failed. If response is null the user canceled the
             // sign-in flow using the back button. Otherwise check
             // response.getError().getErrorCode() and handle the error.
-            if (response != null && response.error != null && response.error!!.errorCode == ErrorCodes.ANONYMOUS_UPGRADE_MERGE_CONFLICT) {
+            if (response == null) {
+                Log.e(TAG, "Back button pressed")
+            } else if (response != null && response.error != null && response.error!!.errorCode == ErrorCodes.ANONYMOUS_UPGRADE_MERGE_CONFLICT) {
                 Toast.makeText(this, "Anonymous Upgrade", Toast.LENGTH_SHORT).show()
                 // 1st save a copy of the data associated with the anonymous acct but in the case of our app, no data is associated yet
 
@@ -122,8 +121,8 @@ class MainActivity : AppCompatActivity() {
                     val auth = Firebase.auth
                     val prevUser = auth.currentUser
                     auth.signInWithCredential(fullCredential)
-                        .addOnSuccessListener { result ->
-                            val currentUser = result.user
+                        .addOnSuccessListener { res ->
+                            val currentUser = res.user
                             Log.d(TAG, "SignInWithCredential: Success")
                             Toast.makeText(this, "signInWithCredential: Success!", Toast.LENGTH_SHORT).show()
                             // Merge prev and currentUser accounts and data
@@ -141,13 +140,10 @@ class MainActivity : AppCompatActivity() {
                         }
                 }
 
-            }
-            /*else if (response!!.error?.errorCode == null) {
-                Log.e(TAG, "Back button pressed")
             } else {
                 Log.e(TAG, "Sign-in failed due to: ${response.error!!.errorCode}", response.error)
-                Toast.makeText(this, "Sign-in failed", Toast.LENGTH_LONG).show()
-            }*/
+                Toast.makeText(this, "Sign-in failed: Null full credential", Toast.LENGTH_LONG).show()
+            }
             // ...
         }
         if (result.resultCode != RESULT_OK && result.resultCode != RESULT_CANCELED) {

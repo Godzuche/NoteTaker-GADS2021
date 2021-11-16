@@ -230,18 +230,27 @@ class ListActivity : AppCompatActivity() {
                     R.string.saved,
                     Toast.LENGTH_LONG
                 ).show()
-            } else {
+            }
+            else if (result.resultCode == RESULT_CANCELED) {
+                val intent = result.data
+                if (intent?.hasExtra(MainActivity.USER_ID) == true && intent.getStringExtra(
+                        MainActivity.USER_ID) != userId && intent.getStringExtra(MainActivity.USER_ID) != "-1"
+                ) {
+                    userId = result.data!!.getStringExtra(MainActivity.USER_ID)!!
+                    loadData()
+
+                    Toast.makeText(
+                        applicationContext,
+                        "cancelled",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }else {
                 Toast.makeText(
                     applicationContext,
                     R.string.not_saved,
                     Toast.LENGTH_LONG
                 ).show()
-                if (result.data!!.hasExtra(MainActivity.USER_ID) && result.data!!.getStringExtra(
-                        MainActivity.USER_ID) != userId && result.data!!.getStringExtra(MainActivity.USER_ID) != "-1"
-                ) {
-                    userId = result.data!!.getStringExtra(MainActivity.USER_ID)!!
-                    loadData()
-                }
             }
         }
 

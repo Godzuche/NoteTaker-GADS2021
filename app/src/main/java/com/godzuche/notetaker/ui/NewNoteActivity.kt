@@ -8,7 +8,6 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.godzuche.notetaker.R
 import com.godzuche.notetaker.databinding.ActivityNewNoteBinding
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -26,12 +25,11 @@ class NewNoteActivity : AppCompatActivity() {
         val user = Firebase.auth.currentUser
         if (user == null || user.isAnonymous) {
             val intent = Intent(this, MainActivity::class.java)
-                .putExtra(MainActivity.SIGNIN_MESSAGE, "Sign-in to create a new note")
+                .putExtra(MainActivity.SIGNIN_MESSAGE, "Sign-in to create t new note")
             signInLauncher.launch(intent)
         }
 
         binding.btnSave.setOnClickListener {
-            val resultIntent = Intent()
 
             if (TextUtils.isEmpty(binding.etTitle.text) || TextUtils.isEmpty(binding.etBody.text)) {
                 resultIntent.putExtra(MainActivity.USER_ID, userId)
@@ -49,6 +47,8 @@ class NewNoteActivity : AppCompatActivity() {
         }
     }
 
+    private val resultIntent = Intent()
+
     private val signInLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             this.onSignInResult(result)
@@ -63,6 +63,14 @@ class NewNoteActivity : AppCompatActivity() {
                 userId = data.getStringExtra(MainActivity.USER_ID)!!
                 Toast.makeText(this, "You can now create and save notes!", Toast.LENGTH_LONG).show()
         }
+    }
+
+    override fun onBackPressed() {
+        intent.apply {
+            putExtra(MainActivity.USER_ID, userId)
+        }
+        setResult(Activity.RESULT_CANCELED, intent)
+        super.onBackPressed()
     }
 
     companion object {
