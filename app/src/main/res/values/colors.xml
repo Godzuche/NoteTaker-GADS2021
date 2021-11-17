@@ -9,9 +9,16 @@
     <color name="white">#FFFFFFFF</color>
 
     //
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
-    <color name="note_background_color">#ffee58</color>
-    <color name="announcement_background_color">#f48fb1</color>
+    <color name="colorPrimary">#ffee58</color>
+    <color name="colorPrimaryLight">#ffff8b</color>
+    <color name="colorPrimaryDark">#c9bc1f</color>
+    <color name="colorSecondary">#42a5f5</color>
+    <color name="colorSecondaryLight">#80d6ff</color>
+    <color name="colorSecondaryDark">#0077c2</color>
+    <color name="colorAccent">#42a5f5</color>
+
+    <color name="note_background_color">@color/colorPrimaryLight</color>
+    <color name="announcement_background_color">@color/colorSecondaryLight</color>
+
+
 </resources>
