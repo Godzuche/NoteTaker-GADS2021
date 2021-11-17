@@ -25,7 +25,7 @@ class NewNoteActivity : AppCompatActivity() {
         val user = Firebase.auth.currentUser
         if (user == null || user.isAnonymous) {
             val intent = Intent(this, MainActivity::class.java)
-                .putExtra(MainActivity.SIGNIN_MESSAGE, "Sign-in to create t new note")
+                .putExtra(MainActivity.SIGNIN_MESSAGE, "Sign-in to create new note")
             signInLauncher.launch(intent)
         }
 
