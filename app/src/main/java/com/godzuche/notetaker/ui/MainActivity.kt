@@ -7,8 +7,11 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.*
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import com.godzuche.notetaker.R
 import com.godzuche.notetaker.databinding.ActivityMainBinding
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -43,14 +46,17 @@ class MainActivity : AppCompatActivity() {
                 AuthUI.IdpConfig.TwitterBuilder().build(),
                 AuthUI.IdpConfig.PhoneBuilder()
 //                    .setDefaultCountryIso("NG")
-                    .setWhitelistedCountries(countries)
+//                    .setWhitelistedCountries(countries)
                     .build()
             )
 
-            val signInIntent = Intent(AuthUI.getInstance().createSignInIntentBuilder()
+            val authUI = AuthUI.getInstance()
+//            authUI.useEmulator("10.0.2.2", 9099)
+            val signInIntent = Intent(authUI.createSignInIntentBuilder()
                 .setAvailableProviders(providers)
                 .setIsSmartLockEnabled(!BuildConfig.DEBUG, true)
                 .enableAnonymousUsersAutoUpgrade()
+                .setTheme(R.style.SignInTheme)
                 .build())
 
             signInLauncher.launch(signInIntent)
