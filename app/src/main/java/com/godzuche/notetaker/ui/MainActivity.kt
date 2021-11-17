@@ -34,6 +34,15 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
+        val auth = Firebase.auth //FirebaseAuth.getInstance()
+
+
+        if (auth.currentUser != null && !auth.currentUser!!.isAnonymous /*&& auth.currentUser.providerData*/) {
+            val intent = Intent(this, ListActivity::class.java)
+            intent.putExtra(USER_ID, auth.currentUser!!.uid)
+            startActivity(intent)
+        }
+
         val countries = ArrayList<String>()
         countries.add("+234")
         //the ISO 2-character code can be used also : "NG"
@@ -62,8 +71,6 @@ class MainActivity : AppCompatActivity() {
             signInLauncher.launch(signInIntent)
         }
 
-        val auth = Firebase.auth //FirebaseAuth.getInstance()
-
         if (intent.hasExtra(SIGNIN_MESSAGE)) {
             binding.btnSkip.isVisible = false
             binding.tvMessage.text = intent.getStringExtra(SIGNIN_MESSAGE)
@@ -81,13 +88,6 @@ class MainActivity : AppCompatActivity() {
                     }
             }
         }
-
-        if (auth.currentUser != null && !auth.currentUser!!.isAnonymous) {
-            val intent = Intent(this, ListActivity::class.java)
-            intent.putExtra(USER_ID, auth.currentUser!!.uid)
-            startActivity(intent)
-        }
-
 
     }
 
@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity() {
             // response.getError().getErrorCode() and handle the error.
             if (response == null) {
                 Log.e(TAG, "Back button pressed")
-            } else if (response != null && response.error != null && response.error!!.errorCode == ErrorCodes.ANONYMOUS_UPGRADE_MERGE_CONFLICT) {
+            } else if (response.error?.errorCode == ErrorCodes.ANONYMOUS_UPGRADE_MERGE_CONFLICT) {
                 Toast.makeText(this, "Anonymous Upgrade", Toast.LENGTH_SHORT).show()
                 // 1st save a copy of the data associated with the anonymous acct but in the case of our app, no data is associated yet
 
