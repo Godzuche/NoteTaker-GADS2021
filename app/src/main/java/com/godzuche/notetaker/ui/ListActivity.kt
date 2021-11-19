@@ -43,7 +43,7 @@ class ListActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
 
-        userId = intent.getStringExtra(MainActivity.USER_ID)!!
+        userId = getUserId()
 
         binding.fab.setOnClickListener {
             val noteResultIntent = Intent(this, NewNoteActivity::class.java)
@@ -53,6 +53,8 @@ class ListActivity : AppCompatActivity() {
         loadData()
 
     }
+
+    private fun getUserId() = Firebase.auth.currentUser?.uid ?: "-1"
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -65,34 +67,17 @@ class ListActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_sync -> true
-            R.id.action_logout -> {
-                logout()
+            R.id.action_settings -> {
+                openSettingsActivity()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    private fun logout() {
-        AuthUI.getInstance().signOut(this)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful)
-                    startActivity(Intent(this, MainActivity::class.java))
-                Toast.makeText(this, "Successfully Signed out!", Toast.LENGTH_SHORT).show()
-            }
-            .addOnSuccessListener {
-                invalidateOptionsMenu()
-            }
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        val auth = Firebase.auth
-        if (auth.currentUser != null && !auth.currentUser!!.isAnonymous) {
-            val menuItem = menu?.findItem(R.id.action_logout)
-            menuItem?.isVisible = true
-        }
-        return super.onPrepareOptionsMenu(menu)
+    private fun openSettingsActivity() {
+        val intent = Intent(this, SettingsActivity::class.java)
+        startActivity(intent)
     }
 
     //region data code
@@ -212,10 +197,8 @@ class ListActivity : AppCompatActivity() {
                     Calendar.getInstance().timeInMillis,
                     false)
 
-                if (intent.hasExtra(MainActivity.USER_ID) && intent.getStringExtra(
-                        MainActivity.USER_ID) != userId && intent.getStringExtra(MainActivity.USER_ID) != "-1"
-                ) {
-                    userId = result.data!!.getStringExtra(MainActivity.USER_ID)!!
+                if (userId != getUserId()) {
+                    userId = getUserId()
                     loadData()
                 }
 

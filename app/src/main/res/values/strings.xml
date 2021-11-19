@@ -19,4 +19,7 @@
     <string name="skip">Skip</string>
     <string name="sign_in_default_message">Sign-in to get started</string>
     <string name="logout">Logout</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="sign_out">Sign Out</string>
 </resources>

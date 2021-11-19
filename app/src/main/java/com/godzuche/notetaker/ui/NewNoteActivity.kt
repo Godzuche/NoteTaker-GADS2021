@@ -25,7 +25,6 @@ class NewNoteActivity : BaseActivity() {
         signInMessage = "Sign-in to create a new note!"
 
         binding.btnSave.setOnClickListener {
-            val resultIntent = Intent()
 
             if (TextUtils.isEmpty(binding.etTitle.text) || TextUtils.isEmpty(binding.etBody.text)) {
                 resultIntent.putExtra(MainActivity.USER_ID, userId)
@@ -42,10 +41,10 @@ class NewNoteActivity : BaseActivity() {
             finish()
         }
     }
-
+    private val resultIntent = Intent()
 
     override fun onBackPressed() {
-        intent.apply {
+        resultIntent.apply {
             putExtra(MainActivity.USER_ID, userId)
         }
         setResult(Activity.RESULT_CANCELED, intent)
